@@ -10,7 +10,13 @@ fn main() {
     let mut rdr = ReaderBuilder::new().delimiter(b';').from_reader(content.as_bytes());
 
     for result in rdr.records() {
-        println!("Texto: {}", result.unwrap().get(2).unwrap().trim());
+        let result = result.unwrap();
+        println!("Texto: {}", get_column_text(result, 2));
     }
 
+}
+
+
+fn get_column_text(result: StringRecord, column_number: usize) -> String {
+    return result.get(column_number).unwrap().trim().to_string();
 }
