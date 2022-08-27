@@ -1,5 +1,5 @@
 use csv::{ReaderBuilder, StringRecord};
-use std::{fs};
+use std::{fs, collections::HashMap};
 
 const FILENAME: &str = "history.csv";
 
@@ -31,17 +31,17 @@ fn main() {
     }
         
         
-    let mut story_data: Vec<StoryRow> = vec![]; 
+    let mut story_data: HashMap<String, StoryRow> = HashMap::new(); 
     let content = fs::read_to_string(FILENAME).unwrap();
     let mut rdr = ReaderBuilder::new().delimiter(b';').from_reader(content.as_bytes());
 
     for result in rdr.records() {
         let result = result.unwrap();
         let row_story = StoryRow::new(result);
-        story_data.push(row_story);
+        story_data.insert(row_story.tag.clone(), row_story);
         // println!("StoryRow: {:?}", row_story);
     }
 
-    println!("Whole history: {:?}", story_data);
+    println!("Whole history: {:?}", story_data["CADAVER"]);
     
 }
