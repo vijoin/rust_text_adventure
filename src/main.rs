@@ -1,8 +1,8 @@
 use csv::{ReaderBuilder, StringRecord};
-use std::{fs, collections::HashMap};
+use std::{fs, collections::HashMap, io::Read};
 
 const FILENAME: &str = "history.csv";
-const FIRST_TAG: &str = "INICIO";
+const FIRST_TAG: &str = "LUZ";
 
 #[derive(Debug)]
 struct StoryRow {
@@ -33,7 +33,7 @@ impl StoryRow{
 
 fn init_story_data() -> HashMap<String, StoryRow> {
     let mut story_data: HashMap<String, StoryRow> = HashMap::new();
-    let mut current_tag = FIRST_TAG;
+    
     let mut last_situation_tag = "".to_string();
      
     let content = fs::read_to_string(FILENAME).unwrap();
@@ -59,9 +59,45 @@ fn init_story_data() -> HashMap<String, StoryRow> {
 
 fn main() {
     let story_data = init_story_data();
-        
-        // println!("StoryRow: {:?}", row_story);
+    let mut current_tag = FIRST_TAG;
 
-    println!("Whole history: {:?}", story_data["DERECHA"]);
+    //Game Loop
+    let mut health = 100;
+    loop {
+        println!("Your health is at {}%", health);
+
+        
+
+        if let Some(data) = story_data.get(current_tag){
+            println!("{}", data.text);
+
+            for (idx, option) in data.options.iter().enumerate() {
+                println!("[{}] {}", idx, option.text);
+            }
+
+            let mut selection = String::new();
+            std::io::stdin().read_line(&mut selection).unwrap();
+            let selection = selection.trim().parse().unwrap_or(99);
+
+            if let Some(chosen_option) = &data.options.get(selection) {
+                current_tag = &chosen_option.tag;
+            }else{
+                println!("Invalid Command!")
+            }
+
+            health += data.health;
+            println!("");
+
+        }else{
+            break;
+        }
+
+        if health <= 0 {
+            println!("You lost!");
+            break;
+        }
+
+    }
+        
     
 }
